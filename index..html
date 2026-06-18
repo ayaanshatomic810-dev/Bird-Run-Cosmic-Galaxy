@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bird Run: Cosmic Galaxy • Overclocked Beat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      background: #010003;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100vh; user-select: none;
+      padding: 40px 20px; color: #fff;
+      overflow-y: auto;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ── HYPER-FANCY BACKGROUND FX ── */
+    .space-warp-tunnel {
+      position: absolute; inset: 0;
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(236, 72, 153, 0.25) 0%, transparent 60%),
+        radial-gradient(circle at 80% 70%, rgba(0, 229, 255, 0.25) 0%, transparent 60%),
+        radial-gradient(circle at 50% 50%, #04010f 0%, #000 100%);
+      z-index: -3;
+    }
+
+    .bg-anomalies {
+      position: absolute; inset: -50%;
+      background-image: 
+        radial-gradient(rgba(168, 85, 247, 0.2) 1px, transparent 0),
+        radial-gradient(rgba(6, 182, 212, 0.2) 1px, transparent 0);
+      background-size: 40px 40px;
+      background-position: 0 0, 20px 20px;
+      z-index: -2;
+      animation: hyperStreamBackground 6s linear infinite;
+    }
+    @keyframes hyperStreamBackground {
+      0% { transform: perspective(500px) rotateX(25deg) translateY(0); }
+      100% { transform: perspective(500px) rotateX(25deg) translateY(40px); }
+    }
+
+    .ambient-glow-pod {
+      position: absolute; width: 700px; height: 700px; border-radius: 50%;
+      filter: blur(160px); opacity: 0.5; mix-blend-mode: screen; z-index: -1;
+      animation: enginePulse 3s infinite alternate ease-in-out;
+    }
+    .glow-left { left: -15%; top: 5%; background: radial-gradient(#ec4899, transparent 70%); }
+    .glow-right { right: -15%; bottom: 5%; background: radial-gradient(#00e5ff, transparent 70%); animation-delay: -1.5s; }
+    
+    @keyframes enginePulse {
+      0% { transform: scale(0.9) translate(0, 0); opacity: 0.4; }
+      100% { transform: scale(1.2) translate(30px, -20px); opacity: 0.7; }
+    }
+
+    .edge-lightning {
+      position: absolute; background: linear-gradient(to bottom, transparent, #ffdd57, #ec4899, #00e5ff, transparent);
+      opacity: 0.8; filter: drop-shadow(0 0 20px #00e5ff); z-index: -1;
+    }
+    .edge-left { left: 10px; top: 0; width: 4px; height: 100%; animation: dropLaser 1.8s infinite linear; }
+    .edge-right { right: 10px; top: 0; width: 4px; height: 100%; animation: dropLaser 1.8s infinite linear; animation-delay: 0.9s; }
+    @keyframes dropLaser { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
+
+    /* ── HEADER DECORATIONS ── */
+    .header-container { text-align: center; margin-bottom: 1rem; position: relative; }
+    h1 {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 3.5rem; letter-spacing: 0.25em; text-transform: uppercase; font-weight: 900;
+      background: linear-gradient(90deg, #ffdd57, #ec4899, #00e5ff, #a855f7, #ffdd57);
+      background-size: 300% auto;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      animation: cosmicStreamer 2s linear infinite, crazyVibe 0.15s infinite alternate;
+      filter: drop-shadow(0 0 20px #ec4899) drop-shadow(0 0 40px #00e5ff);
+    }
+    @keyframes cosmicStreamer { to { background-position: 300% center; } }
+    @keyframes crazyVibe { 0% { transform: translate(1px, 0px) skewX(-1deg); } 100% { transform: translate(-1px, 1px) skewX(1deg); } }
+
+    .stage-container {
+      display: flex; align-items: center; justify-content: center;
+      gap: 40px; max-width: 1500px; width: 100%; position: relative; z-index: 2;
+    }
+
+    @media (max-width: 1250px) {
+      .stage-container { flex-direction: column; gap: 30px; }
+    }
+
+    /* ── MASCOTS ── */
+    .welcome-bird-wingman { display: flex; flex-direction: column; align-items: center; width: 180px; }
+    .talking-bird {
+      width: 110px; height: 110px; border-radius: 50%; position: relative;
+      box-shadow: 0 0 50px var(--glow), inset 0 -8px 16px rgba(0,0,0,0.6);
+      background: var(--main); animation: hyperThrusterFloat 1.2s infinite ease-in-out;
+      border: 4px solid #fff;
+    }
+    .mascot-left .talking-bird { --main: linear-gradient(135deg, #a855f7, #ec4899); --glow: #ec4899; }
+    .mascot-right .talking-bird { --main: linear-gradient(135deg, #00e5ff, #3b82f6); --glow: #00e5ff; animation-delay: 0.6s; }
+
+    @keyframes hyperThrusterFloat {
+      0%, 100% { transform: translateY(0) scale(1) rotate(5deg); }
+      50% { transform: translateY(-25px) scale(1.06) rotate(-5deg); filter: brightness(1.25); }
+    }
+
+    .bird-eye { position: absolute; top: 26px; width: 26px; height: 32px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; animation: autoBlink 2.5s infinite ease-in-out; }
+    .bird-eye.left-eye { left: 28px; } .bird-eye.right-eye { left: 58px; }
+    @keyframes autoBlink { 0%, 45%, 55%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.05); } }
+    .bird-pupil { width: 14px; height: 16px; background: #000; border-radius: 50%; position: relative; animation: twitchyEyes 0.8s infinite alternate ease-in-out; }
+    @keyframes twitchyEyes { 0% { transform: translate(-2px, 1px); } 100% { transform: translate(3px, -2px); } }
+
+    .bird-beak-container { position: absolute; top: 54px; left: 42px; width: 28px; height: 28px; }
+    .beak-top { width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-bottom: 15px solid #ffdd57; position: absolute; z-index: 2; }
+    .beak-bottom { width: 0; height: 0; border-left: 13px solid transparent; border-right: 13px solid transparent; border-top: 13px solid #e6b800; position: absolute; top: 14px; left: 2px; z-index: 1; transform-origin: top center; }
+    .talking-bird.is-talking .beak-bottom { animation: chatter 0.06s infinite alternate linear; }
+    @keyframes chatter { 0% { transform: scaleY(0.1); } 100% { transform: scaleY(1.7) translateY(2px); } }
+
+    .talking-bird::after { content: ''; position: absolute; top: 44px; left: -18px; width: 36px; height: 28px; background: #fff; border-radius: 50%; transform-origin: right center; animation: wingFlap 0.08s infinite alternate linear; box-shadow: 0 0 15px var(--glow); }
+    .mascot-right .talking-bird::after { left: auto; right: -18px; transform-origin: left center; }
+    @keyframes wingFlap { 0% { transform: scaleY(1) rotate(35deg); } 100% { transform: scaleY(0.2) rotate(-25deg); } }
+
+    .speech-bubble {
+      background: #000; border: 3px solid var(--neon); border-radius: 20px; padding: 14px; text-align: center;
+      font-family: 'Courier New', Courier, monospace; font-size: 1rem; font-weight: 900; color: #fff;
+      margin-bottom: 24px; min-height: 75px; width: 220px; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 25px var(--neon); animation: bubbleShudder 0.25s infinite alternate ease-in-out;
+    }
+    .mascot-left { --neon: #ec4899; } .mascot-right { --neon: #00e5ff; }
+    @keyframes bubbleShudder { 0% { transform: scale(0.97) translateY(1px); } 100% { transform: scale(1.03) translateY(-2px); } }
+
+    /* ── CABINET ENGINE ── */
+    .arcade-cabinet-wrapper { position: relative; padding: 15px; }
+    .visualizer-rod { position: absolute; display: flex; justify-content: space-between; gap: 3px; pointer-events: none; }
+    .rod-top { top: -15px; left: 50px; right: 50px; height: 22px; flex-direction: row; }
+    .rod-top span { width: 100%; height: 100%; background: #ec4899; border-radius: 2px; animation: danceBar 0.4s infinite alternate ease-in-out; transform-origin: bottom center; }
+    @keyframes danceBar { 0% { transform: scaleY(0.1); filter: brightness(0.7); } 100% { transform: scaleY(1); filter: brightness(1.6); box-shadow: 0 0 12px currentColor; } }
+    .rod-top span:nth-child(2n) { animation-delay: 0.1s; background: #00e5ff; color: #00e5ff; }
+    .rod-top span:nth-child(3n) { animation-delay: 0.2s; background: #ffdd57; color: #ffdd57; }
+
+    .screen-shaker { transition: transform 0.05s linear; }
+    .shake-active { animation: extremeImpact 0.15s infinite alternate; }
+    @keyframes extremeImpact { 0% { transform: translate(5px, -4px) rotate(0.4deg); } 100% { transform: translate(-5px, 5px) rotate(-0.4deg); } }
+
+    .arcade-cabinet {
+      position: relative; padding: 24px;
+      background: linear-gradient(135deg, #240046 0%, #0a0022 50%, #000 100%);
+      border-radius: 44px; border: 6px solid #7b2cbf;
+      box-shadow: 0 0 50px rgba(147, 51, 234, 0.5), 0 40px 110px #000, 0 0 160px rgba(0, 229, 255, 0.35);
+      max-width: 980px; width: 100%;
+    }
+
+    .arcade-cabinet::before, .arcade-cabinet::after {
+      content: ""; position: absolute; top: 5%; bottom: 5%; width: 12px;
+      background: repeating-linear-gradient(180deg, #ec4899, #ffdd57 15px, #00e5ff 30px, transparent 30px, transparent 50px);
+      box-shadow: 0 0 35px #ec4899;
+    }
+    .arcade-cabinet::before { left: -18px; border-radius: 8px 0 0 8px; }
+    .arcade-cabinet::after { right: -18px; border-radius: 0 8px 8px 0; box-shadow: 0 0 35px #00e5ff; }
+
+    /* ── FIXED TOP DASHBOARD SECTION ── */
+    #score-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 16px;
+      padding: 0 8px;
+      font-family: 'Courier New', Courier, monospace;
+    }
+    .score-badge {
+      background: #000; 
+      padding: 10px 20px; 
+      border-radius: 14px; 
+      border: 3px solid #a855f7; 
+      font-size: 1.3rem; 
+      font-weight: 900; 
+      letter-spacing: 0.15em;
+    }
+    #hi-display { color: #ec4899; text-shadow: 0 0 15px #ec4899; border-color: #ec4899; }
+    #coin-display { color: #ffdd57; text-shadow: 0 0 15px #ffdd57; border-color: #ffdd57; }
+    #score-display { color: #00e5ff; text-shadow: 0 0 15px #00e5ff; border-color: #00e5ff; }
+
+    /* MUTE TOGGLE BADGE STYLING */
+    .audio-badge {
+      background: #000;
+      padding: 10px 18px;
+      border-radius: 14px;
+      border: 3px solid #ef4444;
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #ef4444;
+      text-shadow: 0 0 12px #ef4444;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .audio-badge.muted {
+      border-color: #22c55e;
+      color: #22c55e;
+      text-shadow: 0 0 12px #22c55e;
+    }
+    .audio-badge:hover {
+      transform: scale(1.05);
+    }
+
+    /* CRT DISPLAY TUBE APPARATUS */
+    #game-wrap {
+      position: relative; border-radius: 28px; overflow: hidden;
+      border: 8px solid #0f0326; box-shadow: inset 0 0 100px #000;
+      background: #000;
+    }
+
+    #game-wrap::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%), linear-gradient(90deg, rgba(236, 72, 153, 0.06), rgba(0, 229, 255, 0.06));
+      background-size: 100% 5px, 6px 100%;
+      pointer-events: none; z-index: 7;
+      animation: monitorFlicker 0.15s infinite;
+    }
+    @keyframes monitorFlicker { 0% { opacity: 0.95; } 50% { opacity: 1; } 100% { opacity: 0.93; } }
+
+    canvas { display: block; width: 100%; height: auto; contain: strict; }
+    
+    #overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; background: radial-gradient(circle, rgba(17, 2, 41, 0.98) 0%, #000 100%); z-index: 5; }
+    #overlay-title { font-family: 'Courier New', Courier, monospace; font-size: 4rem; font-weight: 900; letter-spacing: 0.2em; text-transform: uppercase; background: linear-gradient(180deg, #fff 0%, #ffdd57 50%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: ultraGlow 0.6s infinite alternate; }
+    @keyframes ultraGlow { 0% { filter: drop-shadow(0 0 20px #ec4899); transform: scale(0.98); } 100% { filter: drop-shadow(0 0 45px #00e5ff) scale(1.04); } }
+
+    .action-btn {
+      background: linear-gradient(90deg, #ec4899, #ffdd57, #00e5ff, #ec4899); background-size: 200% auto;
+      color: #fff; font-family: 'Courier New', Courier, monospace; font-size: 1.5rem; font-weight: 900; letter-spacing: 0.2em; text-transform: uppercase;
+      padding: 20px 60px; border: none; border-radius: 50px; cursor: pointer;
+      box-shadow: 0 0 40px #ec4899, inset 0 -6px 0 rgba(0,0,0,0.4); animation: hyperBtn 0.8s infinite linear;
+    }
+    @keyframes hyperBtn { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+    .action-btn:hover { transform: scale(1.08) translateY(-2px); box-shadow: 0 0 60px #00e5ff; }
+
+    /* SKIN CUSTOMIZATION */
+    .shop-container { margin-top: 24px; background: #000; border-radius: 28px; padding: 22px; border: 3px solid #a855f7; box-shadow: 0 0 25px rgba(168, 85, 247, 0.4); }
+    .shop-title { font-family: 'Courier New', Courier, monospace; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 0.25em; color: #ffdd57; margin-bottom: 18px; text-align: center; text-shadow: 0 0 15px #ffdd57; }
+    .shop-items { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    @media (max-width: 850px) { .shop-items { grid-template-columns: repeat(2, 1fr); } }
+
+    .shop-card { background: #0a0319; border: 2px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 16px 12px; text-align: center; cursor: pointer; transition: all 0.2s ease; }
+    .shop-card:hover { background: #1e073d; border-color: #00e5ff; transform: scale(1.05); }
+    .shop-card.active { border-color: #00e5ff; background: rgba(0, 229, 255, 0.15); box-shadow: 0 0 25px #00e5ff; }
+    .legendary-card { animation: radiantGlow 1.2s infinite alternate ease-in-out; }
+    @keyframes radiantGlow { 0% { border-color: #ec4899; box-shadow: 0 0 5px #ec4899; } 100% { border-color: #00e5ff; box-shadow: 0 0 25px #00e5ff; } }
+
+    .skin-preview { width: 28px; height: 28px; border-radius: 50%; margin: 0 auto 10px; }
+    .skin-name { font-size: 0.9rem; font-weight: 900; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .skin-cost { font-family: 'Courier New', Courier, monospace; font-size: 0.85rem; color: #ffdd57; }
+
+    #hint { margin-top: 2rem; font-size: 1rem; color: #cbd5e1; letter-spacing: 0.1em; text-align: center; line-height: 1.8; background: #000; padding: 18px 45px; border-radius: 50px; border: 2px solid #a855f7; box-shadow: 0 0 20px rgba(168, 85, 247, 0.3); max-width: 720px; z-index: 2; }
+    #hint strong { color: #00e5ff; text-shadow: 0 0 10px #00e5ff; }
+    
+    #project-link-container { margin-top: 2rem; padding: 16px 36px; border-radius: 20px; background: #000; border: 2px solid #00e5ff; text-align: center; z-index: 2; box-shadow: 0 0 15px rgba(0, 229, 255, 0.2); }
+    #project-link-container p { font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; font-weight: bold; }
+    .project-link { color: #00e5ff; text-decoration: none; font-size: 1.1rem; font-weight: 900; text-shadow: 0 0 10px #00e5ff; }
+    .project-link:hover { color: #ffdd57; text-shadow: 0 0 10px #ffdd57; }
+  </style>
+</head>
+<body>
+
+<div class="space-warp-tunnel"></div>
+<div class="bg-anomalies"></div>
+<div class="ambient-glow-pod glow-left"></div>
+<div class="ambient-glow-pod glow-right"></div>
+<div class="edge-lightning edge-left"></div>
+<div class="edge-lightning edge-right"></div>
+
+<div class="header-container">
+  <h1>🌌 BIRD RUN: COSMIC GALAXY</h1>
+</div>
+
+<div class="stage-container">
+  
+  <div class="welcome-bird-wingman mascot-left">
+    <div class="speech-bubble" id="msg-left">NEBULA SECTOR IS CLEAR!</div>
+    <div class="talking-bird" id="bird-left">
+      <div class="bird-eye left-eye"><div class="bird-pupil"></div></div>
+      <div class="bird-eye right-eye"><div class="bird-pupil"></div></div>
+      <div class="bird-beak-container">
+        <div class="beak-top"></div>
+        <div class="beak-bottom"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen-shaker" id="cabinet-shaker">
+    <div class="arcade-cabinet-wrapper">
+      <div class="visualizer-rod rod-top">
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+
+      <div class="arcade-cabinet">
+        
+        <div id="score-container">
+          <div id="hi-display" class="score-badge">HI 00000</div>
+          <div id="coin-display" class="score-badge">🪙 0</div>
+          <div id="audio-toggle" class="audio-badge" onclick="toggleMuteState()">🔊 SOUND ON</div>
+          <div id="score-display" class="score-badge">00000</div>
+        </div>
+
+        <div id="game-wrap">
+          <canvas id="c" width="900" height="350"></canvas>
+          <div id="overlay">
+            <div id="overlay-title">COSMIC GALAXY</div>
+            <button class="action-btn" id="action-trigger">Launch Vessel</button>
+          </div>
+        </div>
+
+        <div class="shop-container" id="shop-panel">
+          <div class="shop-title">🧬 Character Customization Lab</div>
+          <div class="shop-items">
+            <div class="shop-card active" onclick="buyOrSelectSkin('classic')" id="skin-classic">
+              <div class="skin-preview" style="background: #e040fb; box-shadow: 0 0 8px #ff6ef7;"></div>
+              <div class="skin-name" style="color: #ff6ef7;">Magenta</div>
+              <div class="skin-cost" id="cost-classic">Equipped</div>
+            </div>
+            <div class="shop-card" onclick="buyOrSelectSkin('cyber')" id="skin-cyber">
+              <div class="skin-preview" style="background: #00e5ff; box-shadow: 0 0 8px #57eaff;"></div>
+              <div class="skin-name" style="color: #57eaff;">Cyber Cyan</div>
+              <div class="skin-cost" id="cost-cyber">🪙 250</div>
+            </div>
+            <div class="shop-card" onclick="buyOrSelectSkin('gold')" id="skin-gold">
+              <div class="skin-preview" style="background: #ffd700; box-shadow: 0 0 8px #ffdd57;"></div>
+              <div class="skin-name" style="color: #ffdd57;">Vapor Gold</div>
+              <div class="skin-cost" id="cost-gold">🪙 750</div>
+            </div>
+            <div class="shop-card" onclick="buyOrSelectSkin('phoenix')" id="skin-phoenix">
+              <div class="skin-preview" style="background: #ff3d00; box-shadow: 0 0 12px #ff3d00;"></div>
+              <div class="skin-name" style="color: #ff3d00; font-weight:900;">PHOENIX</div>
+              <div class="skin-cost" id="cost-phoenix">🪙 2,500</div>
+            </div>
+            <div class="shop-card" onclick="buyOrSelectSkin('lime')" id="skin-lime">
+              <div class="skin-preview" style="background: #aeea00; box-shadow: 0 0 8px #aeea00;"></div>
+              <div class="skin-name" style="color: #aeea00;">Neon Lime</div>
+              <div class="skin-cost" id="cost-lime">🪙 5,000</div>
+            </div>
+            <div class="shop-card" onclick="buyOrSelectSkin('sunset')" id="skin-sunset">
+              <div class="skin-preview" style="background: #ff6b6b; box-shadow: 0 0 8px #ff8e53;"></div>
+              <div class="skin-name" style="color: #ff8e53;">Retro Sunset</div>
+              <div class="skin-cost" id="cost-sunset">🪙 12,000</div>
+            </div>
+            <div class="shop-card" onclick="buyOrSelectSkin('prismatic')" id="skin-prismatic">
+              <div class="skin-preview" style="background: #ffffff; box-shadow: 0 0 10px #00ffff;"></div>
+              <div class="skin-name" style="color: #e2e8f0;">Prismatic</div>
+              <div class="skin-cost" id="cost-prismatic">🪙 25,000</div>
+            </div>
+            <div class="shop-card" onclick="buyOrSelectSkin('plasma')" id="skin-plasma">
+              <div class="skin-preview" style="background: #bf55ec; box-shadow: 0 0 12px #9a12b3;"></div>
+              <div class="skin-name" style="color: #bf55ec;">Plasma Void</div>
+              <div class="skin-cost" id="cost-plasma">🪙 50,000</div>
+            </div>
+            <div class="shop-card legendary-card" onclick="buyOrSelectSkin('beast')" id="skin-beast">
+              <div class="skin-preview" style="background: #22c55e; box-shadow: 0 0 12px #ef4444;"></div>
+              <div class="skin-name" style="color: #22c55e; font-weight:800;">Hyper Beast</div>
+              <div class="skin-cost" id="cost-beast">🪙 100,000</div>
+            </div>
+            <div class="shop-card legendary-card" onclick="buyOrSelectSkin('matrix')" id="skin-matrix">
+              <div class="skin-preview" style="background: #00ff66; box-shadow: 0 0 14px #047857;"></div>
+              <div class="skin-name" style="color: #00ff66; font-family:'Courier New';">Starlight</div>
+              <div class="skin-cost" id="cost-matrix">🪙 250,000</div>
+            </div>
+            <div class="shop-card legendary-card" onclick="buyOrSelectSkin('darkmatter')" id="skin-darkmatter">
+              <div class="skin-preview" style="background: #111827; box-shadow: 0 0 16px #ec4899;"></div>
+              <div class="skin-name" style="color: #f472b6; font-weight:900;">Dark Matter</div>
+              <div class="skin-cost" id="cost-darkmatter">🪙 500,000</div>
+            </div>
+            <div class="shop-card legendary-card" onclick="buyOrSelectSkin('nebula')" id="skin-nebula">
+              <div class="skin-preview" style="background: #6366f1; box-shadow: 0 0 20px #3b82f6;"></div>
+              <div class="skin-name" style="color: #60a5fa; font-weight:900; letter-spacing:0.1em;">OVERLORD</div>
+              <div class="skin-cost" id="cost-nebula">🪙 1,000,000</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="welcome-bird-wingman mascot-right">
+    <div class="speech-bubble" id="msg-right">COSMIC WONDERS AWAIT!</div>
+    <div class="talking-bird" id="bird-right">
+      <div class="bird-eye left-eye"><div class="bird-pupil"></div></div>
+      <div class="bird-eye right-eye"><div class="bird-pupil"></div></div>
+      <div class="bird-beak-container">
+        <div class="beak-top"></div>
+        <div class="beak-bottom"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p id="hint">
+  Press <strong>Space / ↑ Arrow</strong> to jump. You have a <strong>TRIPLE JUMP</strong>!<br>
+  ⚠️ Birds scale in gradually as your score ticks past 150. Warning blocks will never double-spawn birds.<br>
+  🎵 Audio engine enhanced with driving electro-synth bass and lead stabs inspired by <em>Geometry Dash: Dash</em>.
+</p>
+
+<div id="project-link-container">
+  <p>Discover More Projects</p>
+  <a class="project-link" href="https://ayaanshatomic810-dev.github.io/Atomic-User-Calculator/" target="_blank">🧮 Atomic User Calculator</a>
+</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+const GROUND = H - 40;
+
+let state = 'idle';
+let score = 0, hiScore = 0, frame = 0;
+let speed = 9.5; 
+let obstacles = [];
+let particles = [];
+let isAudioMuted = false;
+
+let coins = parseInt(localStorage.getItem('br_coins')) || 0;
+let unlockedSkins = JSON.parse(localStorage.getItem('br_skins')) || ['classic'];
+let currentSkin = localStorage.getItem('br_current_skin') || 'classic';
+
+const bgBuffer = document.createElement('canvas');
+bgBuffer.width = W; bgBuffer.height = GROUND;
+const bCtx = bgBuffer.getContext('2d');
+
+function preRenderBackground() {
+  const grad = bCtx.createLinearGradient(0, 0, 0, GROUND);
+  grad.addColorStop(0, '#010005'); grad.addColorStop(0.4, '#0a021c'); grad.addColorStop(0.8, '#1b053a'); grad.addColorStop(1, '#05000a');
+  bCtx.fillStyle = grad; bCtx.fillRect(0, 0, W, GROUND);
+
+  const planetX = W - 140, planetY = 90, planetR = 40;
+  const pGrad = bCtx.createRadialGradient(planetX - 10, planetY - 10, 5, planetX, planetY, planetR);
+  pGrad.addColorStop(0, '#00e5ff'); pGrad.addColorStop(0.6, '#ec4899'); pGrad.addColorStop(1, '#110022');
+  
+  bCtx.shadowColor = '#00e5ff'; bCtx.shadowBlur = 35;
+  bCtx.fillStyle = pGrad; bCtx.beginPath(); bCtx.arc(planetX, planetY, planetR, 0, Math.PI * 2); bCtx.fill();
+  
+  bCtx.strokeStyle = 'rgba(255, 221, 87, 0.4)'; bCtx.lineWidth = 4;
+  bCtx.save(); bCtx.translate(planetX, planetY); bCtx.rotate(-0.25); bCtx.scale(2.2, 0.35);
+  bCtx.beginPath(); bCtx.arc(0, 0, planetR + 12, 0, Math.PI * 2); bCtx.stroke(); bCtx.restore();
+
+  for(let i = 0; i < 75; i++) {
+    let sx = Math.random() * W, sy = Math.random() * (GROUND - 20), sr = Math.random() * 1.6 + 0.5;
+    bCtx.fillStyle = `rgba(255, 255, 255, ${0.4 + Math.random() * 0.5})`;
+    bCtx.beginPath(); bCtx.arc(sx, sy, sr, 0, Math.PI * 2); bCtx.fill();
+  }
+}
+preRenderBackground();
+
+function toggleMuteState() {
+  isAudioMuted = !isAudioMuted;
+  const btn = document.getElementById('audio-toggle');
+  if (isAudioMuted) {
+    btn.textContent = "🔇 MUTED";
+    btn.classList.add('muted');
+  } else {
+    btn.textContent = "🔊 SOUND ON";
+    btn.classList.remove('muted');
+  }
+}
+
+/* ── SYNTHETIC RETRO "GEOMETRY DASH: DASH" STYLE AUDIO ENGINE ── */
+let audioCtx = null;
+let musicSchedulerId = null;
+let currentTempoBPM = 155; 
+let beatDuration = 60 / currentTempoBPM; 
+let nextNoteTime = 0;
+let rhythmStep = 0;
+
+function initAudio() { 
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)(); 
+  }
+}
+
+function playMusicTick() {
+  if (state !== 'playing' || isAudioMuted) return;
+
+  const now = audioCtx.currentTime;
+  while (nextNoteTime < now + 0.1) {
+    let stepTime = nextNoteTime;
+    
+    // 1. Constant driving 16th note electronic bass line (inspired by MDK's Dash drop)
+    let bassOsc = audioCtx.createOscillator();
+    let bassGain = audioCtx.createGain();
+    bassOsc.type = 'sawtooth';
+    
+    let bassProgression = [55.00, 55.00, 65.41, 48.99]; 
+    let currentBass = bassProgression[Math.floor(rhythmStep / 16) % bassProgression.length];
+    
+    if (rhythmStep % 4 === 0) currentBass *= 2; 
+    if (rhythmStep % 8 === 6) currentBass *= 1.2;
+
+    bassOsc.frequency.setValueAtTime(currentBass, stepTime);
+    
+    bassGain.gain.setValueAtTime(0.08, stepTime);
+    bassGain.gain.exponentialRampToValueAtTime(0.01, stepTime + 0.08);
+    
+    bassOsc.connect(bassGain);
+    bassGain.connect(audioCtx.destination);
+    bassOsc.start(stepTime);
+    bassOsc.stop(stepTime + 0.09);
+
+    // 2. High-energy Synth Arpeggiator Lead melody
+    if (rhythmStep % 2 === 0) {
+      let leadOsc = audioCtx.createOscillator();
+      let leadGain = audioCtx.createGain();
+      leadOsc.type = 'square';
+      
+      let synthScale = [440.00, 523.25, 587.33, 659.25, 783.99, 880.00]; 
+      let melodyIndex = (Math.floor(rhythmStep / 2) * 3) % synthScale.length;
+      
+      if (rhythmStep % 16 >= 8) {
+        melodyIndex = (melodyIndex + 2) % synthScale.length;
+      }
+      
+      let melodyPitch = synthScale[melodyIndex];
+
+      leadOsc.frequency.setValueAtTime(melodyPitch, stepTime);
+      if (rhythmStep % 4 === 2) {
+        leadOsc.frequency.exponentialRampToValueAtTime(melodyPitch * 1.5, stepTime + 0.06);
+      }
+      
+      leadGain.gain.setValueAtTime(0.035, stepTime);
+      leadGain.gain.exponentialRampToValueAtTime(0.001, stepTime + 0.06);
+      
+      leadOsc.connect(leadGain);
+      leadGain.connect(audioCtx.destination);
+      leadOsc.start(stepTime);
+      leadOsc.stop(stepTime + 0.07);
+    }
+
+    // 3. Fake Noise Hi-Hat / Snare snap
+    if (rhythmStep % 4 === 2 || rhythmStep % 16 === 14) {
+      let snareOsc = audioCtx.createOscillator();
+      let snareGain = audioCtx.createGain();
+      snareOsc.type = 'triangle';
+      snareOsc.frequency.setValueAtTime(rhythmStep % 16 === 14 ? 180 : 900, stepTime);
+      
+      snareGain.gain.setValueAtTime(0.04, stepTime);
+      snareGain.gain.exponentialRampToValueAtTime(0.001, stepTime + 0.04);
+      
+      snareOsc.connect(snareGain);
+      snareGain.connect(audioCtx.destination);
+      snareOsc.start(stepTime);
+      snareOsc.stop(stepTime + 0.05);
+    }
+
+    nextNoteTime += (beatDuration / 4); 
+    rhythmStep = (rhythmStep + 1) % 64;
+  }
+}
+
+function startCyberLoopMusic() {
+  initAudio();
+  nextNoteTime = audioCtx.currentTime + 0.05;
+  rhythmStep = 0;
+  if (!musicSchedulerId) {
+    musicSchedulerId = setInterval(playMusicTick, 30);
+  }
+}
+
+function stopCyberLoopMusic() {
+  if (musicSchedulerId) {
+    clearInterval(musicSchedulerId);
+    musicSchedulerId = null;
+  }
+}
+
+function playArcadeStartSound() {
+  if (isAudioMuted) return;
+  initAudio(); const now = audioCtx.currentTime;
+  const playNote = (freq, startTime, duration) => {
+    const osc = audioCtx.createOscillator(); const gainNode = audioCtx.createGain();
+    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(freq, startTime);
+    gainNode.gain.setValueAtTime(0.06, startTime); gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+    osc.connect(gainNode); gainNode.connect(audioCtx.destination);
+    osc.start(startTime); osc.stop(startTime + duration);
+  };
+  playNote(261.6, now, 0.06); playNote(329.6, now + 0.05, 0.06); playNote(392, now + 0.1, 0.06); playNote(659.3, now + 0.15, 0.25);
+}
+
+function playJumpSound() {
+  if (isAudioMuted) return;
+  initAudio(); const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator(); const gainNode = audioCtx.createGain();
+  osc.type = 'triangle'; osc.frequency.setValueAtTime(320, now); osc.frequency.exponentialRampToValueAtTime(800, now + 0.1);
+  gainNode.gain.setValueAtTime(0.12, now); gainNode.gain.linearRampToValueAtTime(0.001, now + 0.1);
+  osc.connect(gainNode); gainNode.connect(audioCtx.destination);
+  osc.start(now); osc.stop(now + 0.1);
+}
+
+const greetingsMenu = ["OVERCLOCK ACTIVE!", "ENGAGE WARP DRIVE!", "TRIPLE JUMP READY!", "COIN BOUNTY BUFF!", "SYSTEM LOADED!", "NEBULA FLIGHT!"];
+
+function triggerMascotSpeechEffect() {
+  document.getElementById('bird-left').classList.add('is-talking');
+  document.getElementById('bird-right').classList.add('is-talking');
+  setTimeout(() => {
+    document.getElementById('bird-left').classList.remove('is-talking');
+    document.getElementById('bird-right').classList.remove('is-talking');
+  }, 1800);
+}
+
+function updateWelcomeMessages(isGameOver = false) {
+  if (isGameOver) {
+    document.getElementById('msg-left').textContent = "CRITICAL FAILURE!!!";
+    document.getElementById('msg-right').textContent = "CORE REBOOTED!!!";
+  } else {
+    document.getElementById('msg-left').textContent = greetingsMenu[Math.floor(Math.random() * greetingsMenu.length)];
+    document.getElementById('msg-right').textContent = greetingsMenu[Math.floor(Math.random() * greetingsMenu.length)];
+  }
+  triggerMascotSpeechEffect();
+}
+
+const skinsConfig = {
+  classic:    { main: '#e040fb', wing: '#aa00ff', glow: '#ff6ef7', aura: false },
+  cyber:      { main: '#00e5ff', wing: '#00838f', glow: '#57eaff', aura: false },
+  gold:       { main: '#ffd700', wing: '#ff8f00', glow: '#ffdd57', aura: false },
+  phoenix:    { main: '#ff3d00', wing: '#d84315', glow: '#ff9100', aura: true },
+  lime:       { main: '#aeea00', wing: '#64dd17', glow: '#b2ff59', aura: false },
+  sunset:     { main: '#ff6b6b', wing: '#ff8e53', glow: '#ff4757', aura: false },
+  prismatic:  { main: '#ffffff', wing: '#00ffff', glow: '#ff00ff', aura: true },
+  plasma:     { main: '#bf55ec', wing: '#8e44ad', glow: '#9a12b3', aura: true },
+  beast:      { main: '#22c55e', wing: '#ef4444', glow: '#3b82f6', aura: true },
+  matrix:     { main: '#00ff66', wing: '#064e3b', glow: '#34d399', aura: true },
+  darkmatter: { main: '#111827', wing: '#db2777', glow: '#ec4899', aura: true },
+  nebula:     { main: '#6366f1', wing: '#1d4ed8', glow: '#60a5fa', aura: true }
+};
+
+const skinCosts = { 
+  classic: 0, cyber: 250, gold: 750, phoenix: 2500, lime: 5000, sunset: 12000, 
+  prismatic: 25000, plasma: 50000, beast: 100000, matrix: 250000, darkmatter: 500000, nebula: 1000000 
+};
+
+const scoreDisplay = document.getElementById('score-display');
+const hiDisplay = document.getElementById('hi-display');
+const coinDisplay = document.getElementById('coin-display');
+const overlay = document.getElementById('overlay');
+const overlayTitle = document.getElementById('overlay-title');
+const actionTrigger = document.getElementById('action-trigger');
+const shopPanel = document.getElementById('shop-panel');
+const cabinetShaker = document.getElementById('cabinet-shaker');
+
+const spaceLines = Array.from({ length: 18 }, () => ({
+  x: Math.random() * W, y: Math.random() * (GROUND - 20), len: Math.random() * 40 + 15, opacity: Math.random() * 0.5 + 0.3
+}));
+
+function drawSpeedLines() {
+  ctx.save();
+  for (let i = 0; i < spaceLines.length; i++) {
+    let l = spaceLines[i];
+    if (state === 'playing') {
+      l.x -= speed * 1.5;
+      if (l.x < -l.len) { l.x = W + 10; l.y = Math.random() * (GROUND - 20); }
+    }
+    ctx.strokeStyle = `rgba(0, 229, 255, ${l.opacity})`;
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(l.x, l.y); ctx.lineTo(l.x + l.len, l.y); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+class Particle {
+  constructor(x, y, color) {
+    this.x = x; this.y = y; this.color = color;
+    this.size = Math.random() * 3 + 2;
+    this.vx = (Math.random() - 0.5) * 6 - 2; 
+    this.vy = (Math.random() - 0.5) * 6;
+    this.alpha = 1;
+    this.decay = Math.random() * 0.03 + 0.02;
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy; this.alpha -= this.decay;
+    if (this.alpha < 0) this.alpha = 0;
+  }
+  draw() {
+    ctx.save(); ctx.globalAlpha = this.alpha; ctx.fillStyle = this.color;
+    ctx.shadowColor = this.color; ctx.shadowBlur = 8;
+    ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+}
+
+class Avatar {
+  constructor() {
+    this.x = 75; this.w = 40; this.h = 40;
+    this.y = GROUND - this.h; this.vy = 0;
+    this.gravity = 1.35; this.jumpForce = -17.5; this.jumpsLeft = 3;
+  }
+  jump() {
+    if (this.jumpsLeft > 0) {
+      this.vy = this.jumpForce; this.jumpsLeft--;
+      playJumpSound();
+      for (let i = 0; i < 8; i++) {
+        particles.push(new Particle(this.x + this.w/2, this.y + this.h, skinsConfig[currentSkin].glow));
+      }
+    }
+  }
+  update() {
+    this.vy += this.gravity; this.y += this.vy;
+    if (this.y > GROUND - this.h) { this.y = GROUND - this.h; this.vy = 0; this.jumpsLeft = 3; }
+  }
+  draw() {
+    const cfg = skinsConfig[currentSkin];
+    ctx.save();
+    if (cfg.aura) { ctx.shadowColor = cfg.glow; ctx.shadowBlur = 18; }
+    ctx.fillStyle = cfg.main;
+    ctx.beginPath(); ctx.arc(this.x + this.w/2, this.y + this.h/2, this.w/2, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = cfg.wing;
+    ctx.beginPath(); ctx.ellipse(this.x + 9, this.y + this.h/2 + 3, 7, 10, Math.PI/4, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(this.x + 26, this.y + 14, 5.5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.arc(this.x + 28, this.y + 14, 2.5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#ffdd57';
+    ctx.beginPath(); ctx.moveTo(this.x + this.w - 3, this.y + 16); ctx.lineTo(this.x + this.w + 9, this.y + 22); ctx.lineTo(this.x + this.w - 3, this.y + 28); ctx.fill();
+    ctx.restore();
+  }
+}
+
+class Obstacle {
+  constructor(forceType = null) {
+    let currentScore = Math.floor(frame / 5);
+    
+    if (forceType) {
+      this.type = forceType;
+    } else {
+      // Determine what random assets are available based on progression parameters
+      if (currentScore < 150) {
+        // Safe introduction zone: Only basic tokens and ground columns allowed
+        this.type = Math.random() < 0.25 ? 'coin' : 'cactus';
+      } else {
+        // High threat level zone unlocked: Dynamic mix including flying entities
+        let roll = Math.random();
+        if (roll < 0.25) this.type = 'coin';
+        else if (roll < 0.45) this.type = 'warning-cactus'; // Triggers single structural bird follow-up
+        else if (roll < 0.60) this.type = 'bird';
+        else this.type = 'cactus';
+      }
+    }
+
+    this.isWarning = (this.type === 'warning-cactus');
+    this.subType = 'normal'; 
+    this.swoopTriggered = false;
+
+    if (this.type === 'coin') {
+      this.w = 26; this.h = 26; this.y = GROUND - this.h - 2; 
+    } else if (this.isWarning) {
+      this.w = 32; this.h = 54; this.y = GROUND - this.h;
+    } else if (this.type === 'bird') {
+      this.w = 44; this.h = 32;
+      this.subType = Math.random() < 0.5 ? 'ground-bird' : 'swoop-bird';
+      this.y = this.subType === 'ground-bird' ? GROUND - this.h : GROUND - 170; 
+    } else {
+      this.y = GROUND;
+      const roll = Math.random();
+      if (roll < 0.40) this.subType = 'normal';
+      else if (roll < 0.65) this.subType = 'double';
+      else if (roll < 0.85) this.subType = 'triple';
+      else this.subType = 'ultra';
+      
+      this.w = this.subType === 'normal' ? 28 : (this.subType === 'double' ? 54 : (this.subType === 'triple' ? 76 : 85));
+      this.h = this.subType === 'normal' ? 52 : (this.subType === 'double' ? 58 : (this.subType === 'triple' ? 66 : 75));
+      this.y -= this.h;
+    }
+    this.x = W + 80;
+  }
+  update() {
+    if (this.subType === 'ground-bird') {
+      this.x -= (speed + 3.2); 
+    } else if (this.subType === 'swoop-bird') {
+      this.x -= (speed + 1.8);
+      if (this.x < W * 0.65 && !this.swoopTriggered) this.swoopTriggered = true;
+      if (this.swoopTriggered && this.y < GROUND - this.h) this.y += 4.5; 
+    } else {
+      this.x -= speed;
+    }
+  }
+  draw() {
+    ctx.save();
+    if (this.type === 'coin') {
+      ctx.shadowColor = '#ffdd57'; ctx.shadowBlur = 12; ctx.fillStyle = '#ffdd57';
+      ctx.beginPath(); ctx.arc(this.x + this.w/2, this.y + this.h/2, this.w/2, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(this.x + this.w/2, this.y + this.h/2, this.w/4, 0, Math.PI * 2); ctx.stroke();
+    } else if (this.isWarning) {
+      ctx.shadowColor = '#ff007f'; ctx.shadowBlur = 20; ctx.fillStyle = '#ff007f'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2.5;
+      ctx.fillRect(this.x, this.y, this.w, this.h); ctx.strokeRect(this.x, this.y, this.w, this.h);
+      ctx.fillStyle = '#000000'; ctx.fillRect(this.x + 5, this.y + 12, this.w - 10, 6); ctx.fillRect(this.x + 5, this.y + 28, this.w - 10, 6);
+    } else if (this.type === 'bird') {
+      ctx.shadowColor = '#ff3d00'; ctx.shadowBlur = 15; ctx.fillStyle = '#ff3d00';
+      ctx.beginPath(); ctx.ellipse(this.x + this.w/2, this.y + this.h/2, this.w/2, this.h/2, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffdd57'; ctx.beginPath();
+      let wingWave = Math.sin(frame * 0.3) * (this.h / 2);
+      ctx.moveTo(this.x + this.w/2 - 5, this.y + this.h/2); ctx.lineTo(this.x + this.w/2 + 2, this.y + this.h/2 - wingWave); ctx.lineTo(this.x + this.w/2 + 7, this.y + this.h/2); ctx.fill();
+    } else {
+      if (this.subType === 'normal') { ctx.shadowColor = '#22c55e'; ctx.shadowBlur = 10; ctx.fillStyle = '#022c11'; ctx.strokeStyle = '#22c55e'; } 
+      else if (this.subType === 'double') { ctx.shadowColor = '#a855f7'; ctx.shadowBlur = 12; ctx.fillStyle = '#1e053a'; ctx.strokeStyle = '#a855f7'; } 
+      else if (this.subType === 'triple') { ctx.shadowColor = '#ffdd57'; ctx.shadowBlur = 14; ctx.fillStyle = '#221a00'; ctx.strokeStyle = '#ffdd57'; } 
+      else { ctx.shadowColor = '#00e5ff'; ctx.shadowBlur = 10; ctx.fillStyle = '#11022c'; ctx.strokeStyle = '#00e5ff'; }
+      ctx.lineWidth = 2.5; ctx.fillRect(this.x, this.y, this.w, this.h); ctx.strokeRect(this.x, this.y, this.w, this.h);
+      ctx.fillStyle = '#ec4899';
+      for (let i = 5; i < this.w; i += 18) ctx.fillRect(this.x + i, this.y + 6, 4, this.h - 12);
+    }
+    ctx.restore();
+  }
+}
+
+let player = new Avatar();
+
+function launchVessel() {
+  if (state === 'playing') return;
+  playArcadeStartSound();
+  state = 'playing'; score = 0; speed = 9.5; frame = 0;
+  obstacles = []; particles = []; player = new Avatar();
+  overlay.style.display = 'none';
+  shopPanel.style.pointerEvents = 'none'; shopPanel.style.opacity = '0.4';
+  startCyberLoopMusic();
+}
+
+function stopMatchEngine() {
+  state = 'lost';
+  stopCyberLoopMusic();
+  cabinetShaker.classList.add('shake-active');
+  setTimeout(() => cabinetShaker.classList.remove('shake-active'), 500);
+  
+  if (score > hiScore) { hiScore = score; hiDisplay.textContent = 'HI ' + String(hiScore).padStart(5, '0'); }
+  localStorage.setItem('br_coins', coins);
+  coinDisplay.textContent = '🪙 ' + coins;
+
+  overlayTitle.textContent = "GAME OVER"; actionTrigger.textContent = "Re-Launch";
+  overlay.style.display = 'flex'; shopPanel.style.pointerEvents = 'auto'; shopPanel.style.opacity = '1';
+  updateWelcomeMessages(true);
+}
+
+function processCollision(box1, box2) {
+  return (box1.x < box2.x + box2.w && box1.x + box1.w > box2.x &&
+          box1.y < box2.y + box2.h && box1.y + box1.h > box2.y);
+}
+
+function loop() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.drawImage(bgBuffer, 0, 0);
+  drawSpeedLines();
+
+  ctx.strokeStyle = '#a855f7'; ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.moveTo(0, GROUND); ctx.lineTo(W, GROUND); ctx.stroke();
+  ctx.fillStyle = '#050112'; ctx.fillRect(0, GROUND, W, H - GROUND);
+
+  if (state === 'playing') {
+    frame++;
+    score = Math.floor(frame / 5);
+    scoreDisplay.textContent = String(score).padStart(5, '0');
+    if (frame % 400 === 0) speed += 0.75;
+
+    // Fixed obstacle tick scheduler
+    if (frame % 46 === 0) {
+      let nextObs = new Obstacle();
+      obstacles.push(nextObs);
+      
+      // If a localized warning block was created, force spawn exactly *one* dynamic bird entity
+      if (nextObs.type === 'warning-cactus') {
+        let scheduledFrame = frame;
+        setTimeout(() => {
+          // Verify match is running and this block correlates exactly to this unique warning tick
+          if (state === 'playing' && scheduledFrame === frame - Math.floor(550 / (1000/60))) {
+            // Force spawn a localized flying bird specifically mapped to this lane sequence
+            obstacles.push(new Obstacle('bird'));
+          }
+        }, 550);
+      }
+    }
+  }
+
+  player.update();
+  player.draw();
+
+  for (let i = obstacles.length - 1; i >= 0; i--) {
+    let o = obstacles[i];
+    o.update(); o.draw();
+
+    if (processCollision(player, o)) {
+      if (o.type === 'coin') {
+        coins += 1; coinDisplay.textContent = '🪙 ' + coins;
+        for (let p = 0; p < 10; p++) particles.push(new Particle(o.x + o.w/2, o.y + o.h/2, '#ffdd57'));
+        obstacles.splice(i, 1); continue;
+      } else {
+        stopMatchEngine();
+      }
+    }
+    if (o.x < -o.w - 40) obstacles.splice(i, 1);
+  }
+
+  for (let i = particles.length - 1; i >= 0; i--) {
+    let p = particles[i]; p.update(); p.draw();
+    if (p.alpha <= 0) particles.splice(i, 1);
+  }
+
+  requestAnimationFrame(loop);
+}
+
+function updateSkinsLayout() {
+  Object.keys(skinCosts).forEach(k => {
+    const card = document.getElementById(`skin-${k}`);
+    const label = document.getElementById(`cost-${k}`);
+    if (!card) return;
+    if (currentSkin === k) { card.className = "shop-card active"; label.textContent = "Equipped"; } 
+    else if (unlockedSkins.includes(k)) { card.className = "shop-card"; label.textContent = "Owned"; } 
+    else { card.className = "shop-card"; label.textContent = "🪙 " + skinCosts[k].toLocaleString(); }
+    if (['phoenix','beast','matrix','darkmatter','nebula'].includes(k)) card.classList.add('legendary-card');
+  });
+}
+
+function buyOrSelectSkin(id) {
+  if (unlockedSkins.includes(id)) {
+    currentSkin = id; localStorage.setItem('br_current_skin', id);
+  } else {
+    const price = skinCosts[id];
+    if (coins >= price) {
+      coins -= price; unlockedSkins.push(id); currentSkin = id;
+      localStorage.setItem('br_coins', coins);
+      localStorage.setItem('br_skins', JSON.stringify(unlockedSkins));
+      localStorage.setItem('br_current_skin', id);
+      coinDisplay.textContent = '🪙 ' + coins;
+    } else {
+      alert("⚠️ NOT ENOUGH CHIPS/COINS IN METRICS CACHE!");
+    }
+  }
+  updateSkinsLayout();
+}
+
+window.addEventListener('keydown', e => {
+  if (['Space', 'ArrowUp', ' '].includes(e.key)) {
+    e.preventDefault();
+    if (state === 'playing') player.jump();
+    else if (state === 'idle' || state === 'lost') launchVessel();
+  }
+});
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  if (state === 'playing') player.jump();
+  else if (state === 'idle' || state === 'lost') launchVessel();
+}, { passive: false });
+actionTrigger.addEventListener('click', launchVessel);
+
+coinDisplay.textContent = '🪙 ' + coins;
+updateSkinsLayout();
+setInterval(updateWelcomeMessages, 6000);
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
